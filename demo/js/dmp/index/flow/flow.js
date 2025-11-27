@@ -76,6 +76,8 @@ var categorys = {
 					type: "solid",
 					color: "227,239,250"
 				},
+				anchors: [{ x: "0", y: "h/2" }, { x: "w", y: "h/3" }, { x: "w", y: "2*h/3" }],
+				formEL: [{ name: 'expression', title: '条件表达式', type: 'textarea', require: true, tips: '可以引用父节点的输出，如：${parent.output}' }],
 			},
 		]
 	},
