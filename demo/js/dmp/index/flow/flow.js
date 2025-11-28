@@ -16,6 +16,21 @@ var showCommentIco = true;
 var localRuntime = false;
 var chartVersion = 2;
 
+// 模型定义
+Model.define = {
+    page: {
+        width: 800,
+        height: 600,
+        orientation: "portrait",
+        showGrid: true,
+        gridSize: 20,
+        padding: 20,
+        backgroundColor: "#ffffff"
+    },
+    elements: {},
+    globalVariables: {} // 全局变量存储
+};
+
 var categorys = {
 	'dataSource': {
 		title: '数据源节点', child: [
@@ -77,7 +92,10 @@ var categorys = {
 					color: "227,239,250"
 				},
 				anchors: [{ x: "0", y: "h/2" }, { x: "w", y: "h/3" }, { x: "w", y: "2*h/3" }],
-				formEL: [{ name: 'expression', title: '条件表达式', type: 'textarea', require: true, tips: '可以引用父节点的输出，如：${parent.output}' }],
+				formEL: [
+    { name: 'expression', title: '条件表达式', type: 'textarea', require: true, tips: '可以引用全局变量，如：${global.var1} 或父节点的输出，如：${parent.output}' },
+    { name: 'varSelect', title: '全局变量', type: 'select', require: false, child: [] }
+],
 			},
 		]
 	},
@@ -440,6 +458,236 @@ setTimeout(() => {
 
 //layui使用结束
 
+// 全局变量管理
+function initGlobalVars() {
+    // 初始化变量列表
+    renderVarList();
+    
+    // 添加变量按钮点击事件
+    $('#addVar').click(function() {
+        var varName = $('#varName').val().trim();
+        var varValue = $('#varValue').val().trim();
+        
+        if (!varName || !varValue) {
+            layer.msg('变量名和变量值不能为空');
+            return;
+        }
+        
+        if (Model.define.globalVariables[varName]) {
+            layer.msg('变量名已存在');
+            return;
+        }
+        
+        Model.define.globalVariables[varName] = varValue;
+        renderVarList();
+        updateConditionVarSelect();
+        
+        // 清空输入框
+        $('#varName').val('');
+        $('#varValue').val('');
+    });
+    
+    // 编辑变量按钮点击事件
+    $(document).on('click', '.editVar', function() {
+        var varName = $(this).data('name');
+        var varValue = Model.define.globalVariables[varName];
+        
+        $('#varName').val(varName);
+        $('#varValue').val(varValue);
+        $('#addVar').hide();
+        $('#updateVar').show();
+        $('#deleteVar').show();
+        
+        // 保存当前编辑的变量名
+        $('#updateVar').data('name', varName);
+    });
+    
+    // 更新变量按钮点击事件
+    $('#updateVar').click(function() {
+        var oldName = $(this).data('name');
+        var newName = $('#varName').val().trim();
+        var newValue = $('#varValue').val().trim();
+        
+        if (!newName || !newValue) {
+            layer.msg('变量名和变量值不能为空');
+            return;
+        }
+        
+        if (oldName !== newName && Model.define.globalVariables[newName]) {
+            layer.msg('变量名已存在');
+            return;
+        }
+        
+        // 删除旧变量
+        delete Model.define.globalVariables[oldName];
+        // 添加新变量
+        Model.define.globalVariables[newName] = newValue;
+        
+        renderVarList();
+        updateConditionVarSelect();
+        
+        // 重置按钮状态
+        $('#varName').val('');
+        $('#varValue').val('');
+        $('#addVar').show();
+        $('#updateVar').hide();
+        $('#deleteVar').hide();
+    });
+    
+    // 删除变量按钮点击事件
+    $('#deleteVar').click(function() {
+        var varName = $(this).data('name');
+        
+        layer.confirm('确定要删除变量 "' + varName + '" 吗？', function(index) {
+            delete Model.define.globalVariables[varName];
+            renderVarList();
+            updateConditionVarSelect();
+            
+            // 重置按钮状态
+            $('#varName').val('');
+            $('#varValue').val('');
+            $('#addVar').show();
+            $('#updateVar').hide();
+            $('#deleteVar').hide();
+            
+            layer.close(index);
+        });
+    });
+    
+    // 取消编辑按钮（可以点击页面其他地方取消）
+    $(document).click(function(event) {
+        if (!$(event.target).closest('#globalVars').length) {
+            $('#varName').val('');
+            $('#varValue').val('');
+            $('#addVar').show();
+            $('#updateVar').hide();
+            $('#deleteVar').hide();
+        }
+    });
+}
+
+// 渲染变量列表
+function renderVarList() {
+    var varList = $('#varList');
+    varList.empty();
+    
+    for (var name in Model.define.globalVariables) {
+        var value = Model.define.globalVariables[name];
+        var tr = $('<tr>');
+        tr.append($('<td>').text(name));
+        tr.append($('<td>').text(value));
+        tr.append($('<td>').html('<button class="layui-btn layui-btn-xs editVar" data-name="' + name + '">编辑</button>'));
+        varList.append(tr);
+    }
+    
+    if (Object.keys(Model.define.globalVariables).length === 0) {
+        varList.append($('<tr>').append($('<td colspan="3">').text('暂无全局变量')));
+    }
+}
+
+// 更新条件节点的变量选择框
+function updateConditionVarSelect() {
+    // 找到所有条件节点的变量选择框
+    var varSelects = $('select[name="varSelect"]');
+    
+    varSelects.each(function() {
+        var select = $(this);
+        select.empty();
+        select.append($('<option>').val('').text('选择全局变量'));
+        
+        // 添加所有全局变量
+        for (var name in Model.define.globalVariables) {
+            select.append($('<option>').val(name).text(name));
+        }
+        
+        // 渲染layui select
+        layui.form.render('select');
+    });
+}
+
+// 全局变量选择框变化事件
+$(document).on('change', 'select[name="varSelect"]', function() {
+	var varName = $(this).val();
+	var textarea = $(this).closest('.layui-form-item').prev().find('textarea[name="expression"]');
+	
+	if (varName) {
+		// 将选中的变量插入到表达式中
+		var currentValue = textarea.val();
+		textarea.val(currentValue + '${global.' + varName + '}');
+		
+		// 重置选择框
+		$(this).val('');
+		layui.form.render('select');
+	}
+});
+
+// 打开全局变量管理界面
+function showGlobalVars() {
+	// 初始化全局变量管理
+	initGlobalVars();
+	
+	// 打开全局变量管理弹窗
+	layer.open({
+		type: 1,
+		title: '全局变量管理',
+		offset: 'auto',
+		area: ['600px', '400px'],
+		content: $('#globalVars'),
+		btn: '关闭',
+		btnAlign: 'c',
+		shade: 0.1,
+		move: 0,
+		shadeClose: true
+	});
+}
+
+// 解析表达式中的全局变量并计算结果
+function evaluateExpression(expression) {
+	// 替换表达式中的全局变量
+	var replacedExpression = expression.replace(/\$\{global\.([^}]+)\}/g, function(match, varName) {
+		return Model.define.globalVariables[varName] || 'undefined';
+	});
+	
+	// 计算表达式结果
+	try {
+		var result = eval(replacedExpression);
+		return result;
+	} catch (e) {
+		console.error('表达式计算错误:', e);
+		return false;
+	}
+}
+
+// 执行流程
+function executeFlow() {
+	// 获取所有节点
+	var nodes = Model.define.elements;
+	
+	// 遍历节点并执行
+	for (var nodeId in nodes) {
+		var node = nodes[nodeId];
+		
+		// 如果是条件节点
+		if (node.type === 'control') {
+			// 计算表达式结果
+			var expression = node.properties.expression;
+			var result = evaluateExpression(expression);
+			
+			// 根据结果执行不同分支
+			if (result) {
+				console.log('条件节点', nodeId, '结果为真，执行真分支');
+				// 这里可以添加执行真分支的逻辑
+			} else {
+				console.log('条件节点', nodeId, '结果为假，执行假分支');
+				// 这里可以添加执行假分支的逻辑
+			}
+		} else {
+			console.log('执行节点', nodeId);
+			// 这里可以添加执行其他节点的逻辑
+		}
+	}
+}
+
 function nodeConf(node) {
 	var nodeId = node.id, data = $('#' + nodeId).data('node') || {}, conf = $("#configure");
 	var form = layui.form, laytpl = layui.laytpl;
@@ -456,6 +704,12 @@ function nodeConf(node) {
 		conf.find('[name="remark"').val(data.remark || '');
 		conf.find('.layui-tab-content .layui-tab-item:eq(0)').html(html);
 		form.render();
+		
+		// 如果是条件节点，初始化变量选择框
+		if (node.name === 'control') {
+			updateConditionVarSelect();
+		}
+		
 		conf.show();
 		conf.find('.layui-tab-title li:first').click();
 	});

@@ -1,0 +1,79 @@
+/* layui.css - 简化版 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.layui-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.layui-header {
+    background-color: #1E9FFF;
+    color: white;
+    padding: 0 15px;
+    height: 60px;
+    line-height: 60px;
+}
+
+.layui-logo {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.layui-nav {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.layui-nav-item {
+    margin: 0 10px;
+}
+
+.layui-nav-item a {
+    color: white;
+    text-decoration: none;
+}
+
+.layui-side {
+    width: 200px;
+    background-color: #393D49;
+    color: white;
+}
+
+.layui-side-scroll {
+    padding: 10px;
+}
+
+.layui-nav-tree {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.layui-nav-tree .layui-nav-item {
+    margin: 0;
+}
+
+.layui-nav-tree .layui-nav-item a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+}
+
+.layui-body {
+    flex: 1;
+    padding: 20px;
+}
+
+.layui-footer {
+    background-color: #eee;
+    padding: 10px;
+    text-align: center;
+}

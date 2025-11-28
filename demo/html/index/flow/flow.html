@@ -1,203 +1,157 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>任务流程图</title>
-	
-	<link type="text/css" rel="stylesheet" href="../../../css/font-awesome/css/font-awesome.min.css" />
-	<link type="text/css" rel="stylesheet" href="../../../js/plugin/flow/global.css" type="text/css">
-	<link type="text/css" rel="stylesheet" href="../../../js/plugin/flow/designer.css">
-	<link type="text/css" rel="stylesheet" href="../../../js/plugin/flow/ui.css">
+    <meta charset="UTF-8">
+    <title>Flow Editor</title>
+    <link rel="stylesheet" href="../../../css/flow.css">
+    <link rel="stylesheet" href="../../../css/layui.css">
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script src="../../../js/layui.js"></script>
+    <script src="../../../../source/processon_files/flow.js"></script>
 </head>
-
 <body>
-	<canvas id="support_canvas" style="display: none;"></canvas>
-	<script type="text/javascript">
-		if (!document.getElementById("support_canvas").getContext) {
-			UI.showTip('您的浏览器不支持canvas特性，请使用谷歌或火狐浏览器。');
-		}
-	</script>
-	<div id="designer">
-		<!-- <div class="flow-tool">
-			<div class="middle">
-				<a class="plus" style="float:left;" href="#"><img src="/static/processon/img/node/plus.png"
-						style="height: 15px;margin-top: -3px;"> <span>放大</span></a>
-				<a class="minus" style="float:left;" href="#"><img src="/static/processon/img/node/sub.png"
-						style="height: 15px;margin-top: -3px;"> <span>缩小</span></a>
-			</div>
-		</div> -->
-		<div id="shape_panel" class="layout" style="height: calc(100%);"></div>
-		<div id="designer_viewport">
-			<div id="designer_layout" class="layout">
-				<div id="canvas_container" style="cursor: default;width: 100%;">
-					<div id="designer_canvas" style="background-color: rgb(48, 242, 242);">
-						<ul id="designer_contextmenu" class="menu list options_menu">
-							<li ac="selectall">
-								<div class="ico fa fa-font"></div>全选<div class="extend">Ctrl+A</div>
-							</li>
-							<li ac="delete">
-								<div class="ico remove"></div>删除<div class="extend">Delete/Backspace</div>
-							</li>
-						</ul>
-					</div>
-				</div>
-				<div id="shape_img_container"></div>
-				<div id="layout_block"></div>
-			</div>
-
-			<div id="dock" style="right: 9px;">
-				<div class="dock_header"></div>
-				<div class="dock_buttons">
-					<div id="dock_btn_navigator" title="导航" disabletitle="true" class="toolbar_button"
-						onclick="Dock.showView(&#39;navigator&#39;, true)">
-						<div class="ico ico_dock_nav"></div>
-					</div>
-				</div>
-			</div>
-			<div id="navigation_view" class="dock_view dock_view_navigator" style="right: 45px; display: none;">
-				<div class="dock_view_header">导航
-					<div class="ico ico_dock_collapse"></div>
-				</div>
-				<div class="navigation_bounding">
-					<div class="navigation_view_container">
-						<canvas id="navigation_canvas" width="120px" height="160px"></canvas>
-						<div id="navigation_eye" style="left: -1px; top: -1px; width: 0px; height: 0px;"></div>
-					</div>
-				</div>
-				<div class="dock_devider" style="margin: 0px 10px"></div>
-				<div class="navigation_view_bar">缩放：
-					<div id="dock_zoom" class="spinner active" min="50" max="200" old="50%">
-						<div class="spinner_input"><input></div>
-						<div class="buttons">
-							<div class="spinner_up"></div>
-							<div class="spinner_down"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div id="configure">
-			<form class="layui-form">
-				<div class="layui-tab layui-tab-brief" style="margin: 0;">
-					<ul class="layui-tab-title">
-						<li class="layui-this" style="width: 40%;">配置</li>
-						<li style="width: 35%;">描述</li>
-					</ul>
-					<div class="layui-tab-content">
-						<div class="layui-tab-item layui-show"></div>
-						<div class="layui-tab-item">
-							<input type="hidden" name="nodeId" class="layui-hide" />
-							<textarea name="remark" lay-verify="remark" style="height: 280px;" class="layui-textarea"
-								placeholder="请描述组件涉及的业务"></textarea>
-						</div>
-					</div>
-				</div>
-				<div style="text-align: center;">
-					<button type="button" class="layui-btn layui-btn-danger layui-btn-small" id="confiSave" lay-submit
-						lay-filter="nodesave">保存</button>
-					<button type="button" class="layui-btn layui-btn-primary layui-btn-small" id="cancel">关闭</button>
-				</div>
-			</form>
-			<div class="template layui-hide"></div>
-		</div>
-		<div id="addJob" style="display: none;">
-			<form class="layui-form" style="padding: 20px 40px 0 0;">
-				<div class="layui-form-item">
-					<label class="layui-form-label">任务名称 <font>*</font></label>
-					<div class="layui-input-block">
-						<input type="text" name="name" lay-verify="required|name" placeholder="请输入任务名称"
-							class="layui-input" />
-					</div>
-				</div>
-				<div class="layui-form-item">
-					<label class="layui-form-label">任务描述 <font>*</font></label>
-					<div class="layui-input-block">
-						<textarea name="remark" lay-verify="required|remark" class="layui-textarea"
-							placeholder="请输入任务描述"></textarea>
-					</div>
-				</div>
-				<button class="layui-addJob layui-hide" lay-submit="" lay-filter="addJob">submit</button>
-				<button class="layui-reset layui-hide" type="reset">reset</button>
-			</form>
-		</div>
-	</div>
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header">
+            <div class="layui-logo">Flow Editor</div>
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item"><a href="#">首页</a></li>
+                <li class="layui-nav-item"><a href="#">文档</a></li>
+                <li class="layui-nav-item"><a href="#">关于</a></li>
+            </ul>
+        </div>
+        <div class="layui-side layui-bg-black">
+            <div class="layui-side-scroll">
+                <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a class="" href="javascript:;">节点管理</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="javascript:;" id="add_node">添加节点</a></dd>
+                            <dd><a href="javascript:;" id="delete_node">删除节点</a></dd>
+                            <dd><a href="javascript:;" id="edit_node">编辑节点</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">流程管理</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="javascript:;" id="save_flow">保存流程</a></dd>
+                            <dd><a href="javascript:;" id="load_flow">加载流程</a></dd>
+                        </dl>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="layui-body">
+            <div id="flow_container"></div>
+        </div>
+        <div class="layui-footer">
+            Flow Editor © 2024
+        </div>
+    </div>
+    <div id="add_job" style="display: none;">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">任务名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" required  lay-verify="required" placeholder="请输入任务名称" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">任务描述</label>
+                <div class="layui-input-block">
+                    <textarea name="desc" required lay-verify="required" placeholder="请输入任务描述" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="globalVars" style="display: none;">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">变量名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="varName" required lay-verify="required" placeholder="请输入变量名" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">变量值</label>
+                <div class="layui-input-block">
+                    <input type="text" name="varValue" required lay-verify="required" placeholder="请输入变量值" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="addVar">添加变量</button>
+                    <button class="layui-btn layui-btn-primary" lay-submit lay-filter="updateVar">更新变量</button>
+                    <button class="layui-btn layui-btn-danger" lay-submit lay-filter="deleteVar">删除变量</button>
+                </div>
+            </div>
+        </form>
+        <table class="layui-table" lay-data="{page: false, limit: 10}" lay-filter="varList">
+            <thead>
+                <tr>
+                    <th lay-data="{field:'name', width:200}">变量名</th>
+                    <th lay-data="{field:'value', width:300}">变量值</th>
+                </tr>
+            </thead>
+            <tbody id="varListBody"></tbody>
+        </table>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div id="dock">
+                <ul id="dock_buttons">
+                    <li><a class="layui-icon layui-icon-add-1" id="dock_btn_add" title="添加任务"></a></li>
+                    <li><a class="layui-icon layui-icon-template-1" id="dock_btn_edit" title="编辑任务"></a></li>
+                    <li><a class="layui-icon layui-icon-delete" id="dock_btn_delete" title="删除任务"></a></li>
+                    <li><a class="layui-icon layui-icon-set-fill" id="dock_btn_global_vars" title="全局变量"></a></li>
+                    <li><a class="layui-icon layui-icon-play" id="dock_btn_execute" title="执行流程"></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        layui.use(['form', 'layer', 'table'], function() {
+            var form = layui.form;
+            var layer = layui.layer;
+            var table = layui.table;
+            
+            // 监听提交
+            form.on('submit(formDemo)', function(data) {
+                layer.msg(JSON.stringify(data.field));
+                return false;
+            });
+            
+            // 监听全局变量操作
+            form.on('submit(addVar)', function(data) {
+                addGlobalVariable(data.field.varName, data.field.varValue);
+                return false;
+            });
+            
+            form.on('submit(updateVar)', function(data) {
+                updateGlobalVariable(data.field.varName, data.field.varValue);
+                return false;
+            });
+            
+            form.on('submit(deleteVar)', function(data) {
+                deleteGlobalVariable(data.field.varName);
+                return false;
+            });
+            
+            // 点击全局变量按钮
+            $('#dock_btn_global_vars').click(function() {
+                showGlobalVars();
+            });
+            
+            // 点击执行按钮
+            $('#dock_btn_execute').click(function() {
+                executeFlow();
+            });
+        });
+    </script>
 </body>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/analytics.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/jquery.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/util.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/schema.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/themes.js"></script>
-
-<script type="text/javascript" charset="UTF-8" src="../../../js/dmp/pub/pub.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/dmp/index/flow/flow.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/collaboration.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/designer.core.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/export.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/designer.methods.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/designer.events.js"></script>
-<script type="text/javascript" charset="UTF-8" src="../../../js/plugin/flow/designer.ui.js"></script>
-<script>
-	//回调函数
-	function receiveMessageFromIndex(event) {
-		console.log('我是iframe,我接受到了：', event.data);
-		switch (event.data.code) {
-			case 0://code:0更新UI数据
-				localStorage["def_local_" + chartId] = JSON.stringify(event.data.value);
-				localStorage["def_" + chartId] = JSON.stringify(event.data.value);
-				localStorage["title_local_" + chartId] = '';
-				Designer.open(event.data.value);
-				break;
-			case 1://code:1工具栏方法触发
-				switch (event.data.value) {
-					case 'undo':
-						MessageSource.undo();
-						break;
-					case 'redo':
-						MessageSource.redo();
-						break;
-					case 'copy':
-						Designer.clipboard.copy();
-						break;
-					case 'paste':
-						Designer.clipboard.paste();
-						break;
-					case 'cut':
-						Designer.clipboard.cut();
-					case 'delete':
-						Designer.op.removeShape();
-						break;
-					case 'selectAll':
-						Designer.selectAll();
-						break;
-					case 'duplicate':
-						Designer.clipboard.duplicate();
-						break;
-					case 'zoomIn':
-						Designer.zoomIn();
-						break;
-					case 'zoomOut':
-						Designer.zoomOut();
-						break;
-						break;
-					default:
-						break;
-				}
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	//监听message事件
-	window.addEventListener("message", receiveMessageFromIndex, false);
-
-	var a = { n: 1 }
-	var b = a;
-	a.x = a = { n: 2 }
-	console.log(a.x);
-	console.log(b.x)
-</script>
-
 </html>
