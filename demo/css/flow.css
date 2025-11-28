@@ -1,0 +1,33 @@
+/* flow.css - 流程图编辑器样式 */
+#flow_container {
+    width: 100%;
+    height: 500px;
+    border: 1px solid #eee;
+    overflow: auto;
+}
+
+.flow-node {
+    width: 120px;
+    height: 80px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    position: absolute;
+    cursor: move;
+}
+
+.flow-node-title {
+    padding: 10px;
+    background-color: #1E9FFF;
+    color: white;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.flow-node-content {
+    padding: 10px;
+}
+
+.flow-connection {
+    z-index: 1;
+}
